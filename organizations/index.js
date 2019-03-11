@@ -50,4 +50,35 @@ route.post("/", authenticate, (req, res) => {
   }
 });
 
+route.delete("/:id", (req, res) => {
+  const { id } = req.params;
+
+  db("organizations")
+    .where({ id })
+    .first()
+    .then(org => {
+      if (!org) {
+        res.status(401).json({ message: "Organization does not exists" });
+      } else {
+        db("organizations")
+          .where({ id })
+          .del()
+          .then(result => {
+            if (result) {
+              db("organizations").then(orgs => {
+                res.json(orgs);
+              });
+            } else {
+              res
+                .status(401)
+                .json({ message: "Failed to delete organization" });
+            }
+          });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({ message: "Server error" });
+    });
+});
+
 module.exports = route;
