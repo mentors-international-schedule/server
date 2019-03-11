@@ -42,4 +42,39 @@ route.post("/register", (req, res) => {
   }
 });
 
+route.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(422).json({ message: "All fields required" });
+  } else {
+    db("users")
+      .where({ email })
+      .first()
+      .then(user => {
+        if (user) {
+          const isValid = bcrypt.compareSync(password, user.password);
+          if (isValid) {
+            genToken(newUser).then(token => {
+              res.status(201).json({
+                id: newUser.id,
+                email: newUser.email,
+                firstname: newUser.firstname,
+                lastname: newUser.lastname,
+                token
+              });
+            });
+          } else {
+            res.status(403).json({ message: "Invalid credentials" });
+          }
+        } else {
+          res.status(404).json({ message: "User not found" });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({ message: "Server error" });
+      });
+  }
+});
+
 module.exports = route;
