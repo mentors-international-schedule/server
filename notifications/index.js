@@ -14,6 +14,7 @@ route.post("/", (req, res) => {
   const bindings = phoneNumbers.map(number => {
     return JSON.stringify({ binding_type: "sms", address: number });
   });
+
   service.notifications
     .create({
       toBinding: bindings,
