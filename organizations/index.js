@@ -58,7 +58,7 @@ route.delete("/:id", (req, res) => {
     .first()
     .then(org => {
       if (!org) {
-        res.status(401).json({ message: "Organization does not exists" });
+        res.status(404).json({ message: "Organization does not exists" });
       } else {
         db("organizations")
           .where({ id })
@@ -79,6 +79,44 @@ route.delete("/:id", (req, res) => {
     .catch(error => {
       res.status(500).json({ message: "Server error" });
     });
+});
+
+route.put("/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  if (!name) {
+    res.status(422).json({ message: "Name is required" });
+  } else {
+    db("organizations")
+      .where({ id })
+      .first()
+      .then(org => {
+        if (!org) {
+          res.status(404).json({ message: "Organization does not exist" });
+        } else {
+          db("organizations")
+            .where({ id })
+            .update({ name })
+            .then(result => {
+              if (result) {
+                db("organizations").then(orgs => {
+                  res.json(orgs);
+                });
+              } else {
+                res
+                  .status(401)
+                  .json({ message: "Failed to update organization" });
+              }
+            })
+            .catch(error => {
+              res.status(500).json({ message: "Organization already exists" });
+            });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({ message: "Server Error" });
+      });
+  }
 });
 
 module.exports = route;
