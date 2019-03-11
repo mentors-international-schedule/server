@@ -2,7 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 // const notifications = require("./notifications");
-const register = require("./register");
+const users = require("./users");
 const server = express();
 
 // Middleware
@@ -12,6 +12,6 @@ server.use(express.json());
 
 // Routes
 // server.use("/api/notifications", notifications);
-server.use("/api/users", register);
+server.use("/api/users", users);
 
 module.exports = server;
