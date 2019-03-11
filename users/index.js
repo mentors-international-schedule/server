@@ -55,12 +55,12 @@ route.post("/login", (req, res) => {
         if (user) {
           const isValid = bcrypt.compareSync(password, user.password);
           if (isValid) {
-            genToken(newUser).then(token => {
+            genToken(user).then(token => {
               res.status(201).json({
-                id: newUser.id,
-                email: newUser.email,
-                firstname: newUser.firstname,
-                lastname: newUser.lastname,
+                id: user.id,
+                email: user.email,
+                firstname: user.firstname,
+                lastname: user.lastname,
                 token
               });
             });
@@ -70,9 +70,6 @@ route.post("/login", (req, res) => {
         } else {
           res.status(404).json({ message: "User not found" });
         }
-      })
-      .catch(error => {
-        res.status(500).json({ message: "Server error" });
       });
   }
 });
