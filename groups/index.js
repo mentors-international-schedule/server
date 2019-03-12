@@ -79,5 +79,43 @@ route.put("/:id", authenticate, (req, res) => {
   }
 });
 // DELETE Group
+route.delete("/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.decoded.id;
+
+  db("groups")
+    .where({ id })
+    .first()
+    .then(group => {
+      if (!group) {
+        res.status(404).json({ message: "group does not exist" });
+      } else {
+        if (group.user_id != user_id) {
+          res
+            .status(403)
+            .json({
+              message: "you are not allowed to delete some one else's post"
+            });
+        } else {
+          db("groups")
+            .where({ id })
+            .del()
+            .then(result => {
+              if (result) {
+                res.json({ message: "Deleted group", success: true });
+              } else {
+                res.status(500).json({ message: "Failed to delete group" });
+              }
+            })
+            .catch(() => {
+              res.status(500).json({ message: "Server Error" });
+            });
+        }
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server Error" });
+    });
+});
 
 module.exports = route;
