@@ -51,7 +51,33 @@ route.post("/", authenticate, (req, res) => {
 });
 
 // PUT group
+route.put("/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.decoded.id;
+  const { name } = req.body;
 
+  if (!name) {
+    res.status(422).json({ message: "Name required" });
+  } else {
+    if (id != user_id) {
+      res.status(401).json({ message: "You cannot edit someone else's group" });
+    } else {
+      db("groups")
+        .where({ id })
+        .update({ name })
+        .then(result => {
+          if (result) {
+            res.status(200).json({ id, name, user_id });
+          } else {
+            res.status(500).json({ message: "Failed to update group" });
+          }
+        })
+        .catch(() => {
+          res.status(500).json({ message: "Server Error" });
+        });
+    }
+  }
+});
 // DELETE Group
 
 module.exports = route;
