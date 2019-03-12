@@ -1,5 +1,5 @@
 const route = require("express").Router();
-
+const db = require("../data/dbConfig");
 const accountSid = process.env.ACCOUNT_SID;
 const authToken = process.env.AUTH_TOKEN;
 const notifySid = process.env.SERVICE_SID;

@@ -45,9 +45,9 @@ route.post("/", authenticate, (req, res) => {
             .returning("id")
             .then(id => {
               if (id[0]) {
-                db("organizations").then(orgs => {
-                  res.status(201).json(orgs);
-                });
+                res
+                  .status(201)
+                  .json({ message: "Successfully created", success: true });
               } else {
                 res.status(401).json({ message: "Failed to add organization" });
               }

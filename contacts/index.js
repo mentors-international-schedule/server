@@ -39,6 +39,19 @@ route.post("/", authenticate, (req, res) => {
   }
 });
 
+route.get("/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+
+  db("contacts")
+    .where({ group_id: id })
+    .then(contacts => {
+      res.json(contacts);
+    })
+    .catch(() => {
+      res.status(500).json({ messahe: "Server Error" });
+    });
+});
+
 route.delete("/:id", authenticate, (req, res) => {
   const { id } = req.params;
   const user_id = req.decoded.id;
