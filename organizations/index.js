@@ -45,9 +45,21 @@ route.post("/", authenticate, (req, res) => {
             .returning("id")
             .then(id => {
               if (id[0]) {
-                res
-                  .status(201)
-                  .json({ message: "Successfully created", success: true });
+                db("userOrganizations")
+                  .insert({ user_id, oragnization_id: id[0] })
+                  .returning("id")
+                  .then(result => {
+                    if (result[0]) {
+                      res.status(201).json({
+                        message: "Successfully created",
+                        success: true
+                      });
+                    } else {
+                      res
+                        .status(500)
+                        .json({ message: "Failed to join organization" });
+                    }
+                  });
               } else {
                 res.status(401).json({ message: "Failed to add organization" });
               }
@@ -130,6 +142,27 @@ route.put("/:id", authenticate, (req, res) => {
         res.status(500).json({ message: "Server Error" });
       });
   }
+});
+
+route.post("/join", authenticate, (req, res) => {
+  const user_id = req.decoded.id;
+  const { organization_id } = req.body;
+
+  db("userOrganizations")
+    .insert({ user_id, organization_id })
+    .returning("id")
+    .then(result => {
+      if (result[0]) {
+        res
+          .status(201)
+          .json({ message: "Succefully joined organization", success: true });
+      } else {
+        res.status(500).json({ message: "Failed to join organization" });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server Error" });
+    });
 });
 
 module.exports = route;
