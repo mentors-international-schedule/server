@@ -27,6 +27,9 @@ route.post("/", authenticate, (req, res) => {
               } else {
                 res.status(500).json({ message: "Failed to add contacts" });
               }
+            })
+            .catch(() => {
+              res.status(500).json({ message: "Failed to add contacts" });
             });
         }
       })
