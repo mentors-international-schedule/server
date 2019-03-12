@@ -39,4 +39,67 @@ route.post("/", authenticate, (req, res) => {
   }
 });
 
+route.get("/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+
+  db("contacts")
+    .where({ group_id: id })
+    .then(contacts => {
+      res.json(contacts);
+    })
+    .catch(() => {
+      res.status(500).json({ messahe: "Server Error" });
+    });
+});
+
+route.delete("/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.decoded.id;
+
+  db("contacts")
+    .where({ id })
+    .first()
+    .then(contact => {
+      if (!contact) {
+        res.status(404).json({ message: "Contact not found" });
+      } else {
+        db("groups")
+          .where({ id: contact.group_id })
+          .first()
+          .then(group => {
+            if (group.user_id != user_id) {
+              res
+                .status(403)
+                .json({ message: "You can not delete this contact" });
+            } else {
+              db("contacts")
+                .where({ id })
+                .del()
+                .then(result => {
+                  if (result) {
+                    res.json({
+                      message: "Contact deleted successfully",
+                      success: true
+                    });
+                  } else {
+                    res
+                      .status(500)
+                      .json({ message: "Failed to delete contact" });
+                  }
+                })
+                .catch(() => {
+                  res.status(500).json({ message: "Server Error" });
+                });
+            }
+          })
+          .catch(() => {
+            res.status(500).json({ message: "Server Error" });
+          });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server Error" });
+    });
+});
+
 module.exports = route;
