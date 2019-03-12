@@ -7,25 +7,35 @@ const notifySid = process.env.SERVICE_SID;
 const client = require("twilio")(accountSid, authToken);
 
 route.post("/", (req, res) => {
-  const phoneNumbers = ["+13053190388", "+19195000265"];
-  const body = "Ice creams are coming!";
+  const { message, contact_ids } = req.body;
+  const phoneNumbers = [];
   const service = client.notify.services(notifySid);
 
-  const bindings = phoneNumbers.map(number => {
-    return JSON.stringify({ binding_type: "sms", address: number });
-  });
-
-  service.notifications
-    .create({
-      toBinding: bindings,
-      body: body
-    })
-    .then(notification => {
-      res.json(notification);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+  if (!message || !contact_ids) {
+    res.status(422).json({ message: "Message and contacts required" });
+  } else {
+    db("contacts")
+      .whereIn("id", contact_ids)
+      .then(contacts => {
+        contacts.map(contact => {
+          phoneNumbers.push(contact.phone_number);
+        });
+        const bindings = phoneNumbers.map(number => {
+          return JSON.stringify({ binding_type: "sms", address: number });
+        });
+        service.notifications
+          .create({
+            toBinding: bindings,
+            body: message
+          })
+          .then(notification => {
+            res.json(notification);
+          })
+          .catch(err => {
+            res.status(500).json(err);
+          });
+      });
+  }
 });
 
 module.exports = route;
