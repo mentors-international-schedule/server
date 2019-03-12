@@ -5,6 +5,8 @@ const cors = require("cors");
 const notifications = require("./notifications");
 const organizations = require("./organizations");
 const users = require("./users");
+const groups = require("./groups");
+const contacts = require("./contacts");
 const server = express();
 
 // Middleware
@@ -16,5 +18,6 @@ server.use(cors());
 server.use("/api/notifications", notifications);
 server.use("/api/users", users);
 server.use("/api/organizations", organizations);
-
+server.use("/api/groups", groups);
+server.use("/api/contacts", contacts);
 module.exports = server;
