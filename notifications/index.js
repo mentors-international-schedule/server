@@ -7,7 +7,7 @@ const notifySid = process.env.SERVICE_SID;
 const client = require("twilio")(accountSid, authToken);
 
 route.post("/", (req, res) => {
-  const phoneNumbers = ["+16198460543", "+19195000265"];
+  const phoneNumbers = ["+13053190388", "+19195000265"];
   const body = "Ice creams are coming!";
   const service = client.notify.services(notifySid);
 

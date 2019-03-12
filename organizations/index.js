@@ -3,12 +3,9 @@ const db = require("../data/dbConfig");
 const { authenticate } = require("../common/authentication");
 
 route.get("/", authenticate, (req, res) => {
-  const user_id = req.decoded.id;
-
   db("organizations")
     .then(org => {
-      const orgs = org.filter(o => o.user_id !== user_id);
-      res.json(orgs);
+      res.json(org);
     })
     .catch(error => {
       res.status(500).json({ message: "Server Error" });

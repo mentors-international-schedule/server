@@ -54,15 +54,22 @@ route.post("/login", (req, res) => {
       .then(user => {
         if (user) {
           const isValid = bcrypt.compareSync(password, user.password);
+
           if (isValid) {
             genToken(user).then(token => {
-              res.status(201).json({
-                id: user.id,
-                email: user.email,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                token
-              });
+              db("organizations")
+                .where({ user_id: user.id })
+                .first()
+                .then(org => {
+                  res.status(201).json({
+                    id: user.id,
+                    email: user.email,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    organization: org,
+                    token
+                  });
+                });
             });
           } else {
             res.status(403).json({ message: "Invalid credentials" });
