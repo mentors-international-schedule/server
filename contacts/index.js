@@ -52,8 +52,8 @@ route.get("/:id", authenticate, (req, res) => {
     });
 });
 
-route.delete("/:id", authenticate, (req, res) => {
-  const { id } = req.params;
+route.delete("/:id/:groupId", authenticate, (req, res) => {
+  const { id, groupId } = req.params;
   const user_id = req.decoded.id;
 
   db("contacts")
@@ -78,8 +78,9 @@ route.delete("/:id", authenticate, (req, res) => {
                 .then(result => {
                   if (result) {
                     db("contacts")
-                      .whereNot({ group_id: id })
+                      .where({ group_id: groupId })
                       .then(contacts => {
+                        console.log(contacts);
                         res.json(contacts);
                       });
                   } else {
