@@ -64,9 +64,12 @@ route.post("/drafts/:id", authenticate, (req, res) => {
   } else {
     db("messages")
       .insert({ message, user_id, sent: false, group_id })
+      .returning("id")
       .then(result => {
-        if (result.rowCount) {
-          res.status(201).json({ message: "Message saved as draft" });
+        if (result[0]) {
+          res
+            .status(201)
+            .json({ message: "Message saved as draft", message_id: result[0] });
         } else {
           res.status(500).json({ message: "Failed to save message as draft" });
         }
