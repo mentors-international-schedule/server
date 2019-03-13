@@ -36,9 +36,9 @@ route.post("/", authenticate, (req, res) => {
   } else {
     db("groups")
       .insert({ name, user_id: id })
-      .returning("id")
+      // .returning("id")
       .then(result => {
-        if (result[0]) {
+        if (result.rowCount) {
           res.status(201).json({ id: result[0], name, user_id: id });
         } else {
           res.status(500).json({ message: "Failed to add group" });
@@ -91,11 +91,9 @@ route.delete("/:id", authenticate, (req, res) => {
         res.status(404).json({ message: "group does not exist" });
       } else {
         if (group.user_id != user_id) {
-          res
-            .status(403)
-            .json({
-              message: "you are not allowed to delete some one else's post"
-            });
+          res.status(403).json({
+            message: "you are not allowed to delete some one else's post"
+          });
         } else {
           db("groups")
             .where({ id })
