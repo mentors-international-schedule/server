@@ -104,6 +104,25 @@ route.put("/drafts/:id", authenticate, (req, res) => {
   }
 });
 
+route.delete("/drafts/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.decoded.id;
+
+  db("messages")
+    .where({ id, user_id })
+    .del()
+    .then(result => {
+      if (result) {
+        res.json({ message: "Message was deleted", success: true });
+      } else {
+        res.status(500).json({ message: "Failed to delete message" });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server Error" });
+    });
+});
+
 route.get("/:id", authenticate, (req, res) => {
   const group_id = req.params.id;
 
