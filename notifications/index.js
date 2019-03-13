@@ -65,10 +65,34 @@ route.post("/drafts/:id", authenticate, (req, res) => {
     db("messages")
       .insert({ message, user_id, sent: false, group_id })
       .then(result => {
-        if (result[0]) {
+        if (result.rowCount) {
           res.status(201).json({ message: "Message saved as draft" });
         } else {
           res.status(500).json({ message: "Failed to save message as draft" });
+        }
+      })
+      .catch(() => {
+        res.status(500).json({ message: "Server Error" });
+      });
+  }
+});
+
+route.put("/drafts/:id", authenticate, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.decoded.id;
+  const { message } = req.body;
+
+  if (!message) {
+    res.status(422).json({ message: "Message required" });
+  } else {
+    db("messages")
+      .where({ id, user_id })
+      .update({ message })
+      .then(result => {
+        if (result) {
+          res.json({ message: "Message updated", success: true });
+        } else {
+          res.status(500).json({ message: "Failed to update status" });
         }
       })
       .catch(() => {
