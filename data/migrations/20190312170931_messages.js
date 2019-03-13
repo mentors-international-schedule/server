@@ -6,6 +6,10 @@ exports.up = function(knex, Promise) {
       .integer("user_id")
       .references("id")
       .inTable("users");
+    tbl
+      .integer("group_id")
+      .references("id")
+      .inTable("groups");
     tbl.boolean("sent").defaultTo(true);
   });
 };

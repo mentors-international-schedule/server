@@ -91,11 +91,9 @@ route.delete("/:id", authenticate, (req, res) => {
         res.status(404).json({ message: "group does not exist" });
       } else {
         if (group.user_id != user_id) {
-          res
-            .status(403)
-            .json({
-              message: "you are not allowed to delete some one else's post"
-            });
+          res.status(403).json({
+            message: "you are not allowed to delete some one else's post"
+          });
         } else {
           db("groups")
             .where({ id })
