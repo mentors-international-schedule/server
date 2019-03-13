@@ -83,7 +83,11 @@ route.get("/:id", authenticate, (req, res) => {
   db("messages")
     .where({ group_id })
     .then(messages => {
-      res.json(messages);
+      if (messages.length) {
+        res.json(messages);
+      } else {
+        res.status(404).json({ message: "No messages found" });
+      }
     })
     .catch(() => {
       res.status(500).json({ message: "Server Error" });
