@@ -150,9 +150,8 @@ route.post("/join", authenticate, (req, res) => {
 
   db("userOrganizations")
     .insert({ user_id, organization_id })
-    .returning("id")
     .then(result => {
-      if (result[0]) {
+      if (result.rowCount) {
         res
           .status(201)
           .json({ message: "Succefully joined organization", success: true });
