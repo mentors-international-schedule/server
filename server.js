@@ -7,6 +7,7 @@ const organizations = require("./organizations");
 const users = require("./users");
 const groups = require("./groups");
 const contacts = require("./contacts");
+const scheduler = require("./scheduler");
 const server = express();
 
 // Middleware
@@ -20,4 +21,5 @@ server.use("/api/users", users);
 server.use("/api/organizations", organizations);
 server.use("/api/groups", groups);
 server.use("/api/contacts", contacts);
+server.use("/api/scheduler", scheduler);
 module.exports = server;
