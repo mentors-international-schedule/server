@@ -77,9 +77,11 @@ route.delete("/:id", authenticate, (req, res) => {
                 .del()
                 .then(result => {
                   if (result) {
-                    db("contacts").then(contacts => {
-                      res.json(contacts);
-                    });
+                    db("contacts")
+                      .whereNot({ group_id: id })
+                      .then(contacts => {
+                        res.json(contacts);
+                      });
                   } else {
                     res
                       .status(500)
