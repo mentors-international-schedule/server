@@ -7,7 +7,8 @@ const notifySid = process.env.SERVICE_SID;
 
 const client = require("twilio")(accountSid, authToken);
 
-route.post("/", authenticate, (req, res) => {
+route.post("/:id", authenticate, (req, res) => {
+  const group_id = req.params.id;
   const user_id = req.decoded.id;
   const { message, contact_ids } = req.body;
   const phoneNumbers = [];
@@ -32,7 +33,7 @@ route.post("/", authenticate, (req, res) => {
           })
           .then(notification => {
             db("messages")
-              .insert({ message, user_id })
+              .insert({ message, user_id, group_id })
               .returning("id")
               .then(result => {
                 const entries = contact_ids.map(id => ({
@@ -53,7 +54,8 @@ route.post("/", authenticate, (req, res) => {
   }
 });
 
-route.post("/drafts", authenticate, (req, res) => {
+route.post("/drafts/:id", authenticate, (req, res) => {
+  const group_id = req.params.id;
   const user_id = req.decoded.id;
   const { message } = req.body;
 
@@ -61,7 +63,7 @@ route.post("/drafts", authenticate, (req, res) => {
     res.status(422).json({ message: "Message required" });
   } else {
     db("messages")
-      .insert({ message, user_id, sent: false })
+      .insert({ message, user_id, sent: false, group_id })
       .then(result => {
         if (result[0]) {
           res.status(201).json({ message: "Message saved as draft" });
@@ -73,6 +75,19 @@ route.post("/drafts", authenticate, (req, res) => {
         res.status(500).json({ message: "Server Error" });
       });
   }
+});
+
+route.get("/:id", authenticate, (req, res) => {
+  const group_id = req.params.id;
+
+  db("messages")
+    .where({ group_id })
+    .then(messages => {
+      res.json(messages);
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server Error" });
+    });
 });
 
 module.exports = route;
