@@ -77,9 +77,8 @@ route.delete("/:id", authenticate, (req, res) => {
                 .del()
                 .then(result => {
                   if (result) {
-                    res.json({
-                      message: "Contact deleted successfully",
-                      success: true
+                    db("contacts").then(contacts => {
+                      res.json(contacts);
                     });
                   } else {
                     res
