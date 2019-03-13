@@ -36,9 +36,9 @@ route.post("/", authenticate, (req, res) => {
   } else {
     db("groups")
       .insert({ name, user_id: id })
-      // .returning("id")
+      .returning("id")
       .then(result => {
-        if (result.rowCount) {
+        if (result[0]) {
           res.status(201).json({ id: result[0], name, user_id: id });
         } else {
           res.status(500).json({ message: "Failed to add group" });
