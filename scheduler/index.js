@@ -85,4 +85,30 @@ route.get("/:id", authenticate, async (req, res) => {
   }
 });
 
+route.delete("/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+  const user_id = req.decoded.id;
+
+  const scheduled = await db("scheduled").where({ id, user_id });
+
+  if (scheduled) {
+    db("scheduled")
+      .where({ id, user_id })
+      .del()
+      .then(result => {
+        if (result) {
+          res.json({ message: "Scheduled message has been deleted" });
+        } else {
+          res
+            .status(500)
+            .json({ message: "Failed to delete scheduled message" });
+        }
+      })
+      .catch(() => {
+        res.status(500).json({ message: "Server Error" });
+      });
+  } else {
+    res.status(404).json({ message: "Not found" });
+  }
+});
 module.exports = route;
