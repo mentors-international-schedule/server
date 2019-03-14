@@ -46,7 +46,7 @@ route.post("/", authenticate, (req, res) => {
             .then(id => {
               if (id[0]) {
                 db("userOrganizations")
-                  .insert({ user_id, oragnization_id: id[0] })
+                  .insert({ user_id, organization_id: id[0] })
                   .then(result => {
                     if (result.rowCount) {
                       res.status(201).json({
