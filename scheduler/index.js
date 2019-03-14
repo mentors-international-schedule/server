@@ -6,7 +6,8 @@ const accountSid = process.env.ACCOUNT_SID;
 const authToken = process.env.AUTH_TOKEN;
 const notifySid = process.env.SERVICE_SID;
 
-route.post("/", authenticate, (req, res) => {
+route.post("/:id", authenticate, (req, res) => {
+  const group_id = req.params.id;
   const user_id = req.decoded.id;
   const { hour, minute, dayOfWeek, message, contact_ids } = req.body;
   const phoneNumbers = [];
@@ -17,7 +18,7 @@ route.post("/", authenticate, (req, res) => {
   //   res.status(422).json({ message: "Hour, minute and dayOfWeek required" });
   // } else {
   db("scheduled")
-    .insert({ hour, minute, dayOfWeek, user_id })
+    .insert({ hour, minute, dayOfWeek, user_id, group_id, message })
     .returning("id")
     .then(result => {
       if (result[0]) {
@@ -74,17 +75,14 @@ route.post("/", authenticate, (req, res) => {
   // }
 });
 
-route.get("/", authenticate, (req, res) => {
-  const user_id = req.decoded.id;
-
-  db("messages")
-    .where({ user_id })
-    .then(messages => {
-      res.json(messages);
-    })
-    .catch(() => {
-      res.status(500).json({ message: "Server Error" });
-    });
+route.get("/:id", authenticate, async (req, res) => {
+  const group_id = req.params.id;
+  const scheduled = await db("scheduled").where({ group_id });
+  if (scheduled) {
+    res.json(scheduled);
+  } else {
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
 module.exports = route;
