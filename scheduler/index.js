@@ -74,4 +74,17 @@ route.post("/", authenticate, (req, res) => {
   // }
 });
 
+route.get("/", authenticate, (req, res) => {
+  const user_id = req.decoded.id;
+
+  db("messages")
+    .where({ user_id })
+    .then(messages => {
+      res.json(messages);
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server Error" });
+    });
+});
+
 module.exports = route;
