@@ -47,9 +47,8 @@ route.post("/", authenticate, (req, res) => {
               if (id[0]) {
                 db("userOrganizations")
                   .insert({ user_id, oragnization_id: id[0] })
-                  .returning("id")
                   .then(result => {
-                    if (result[0]) {
+                    if (result.rowCount) {
                       res.status(201).json({
                         message: "Successfully created",
                         success: true
