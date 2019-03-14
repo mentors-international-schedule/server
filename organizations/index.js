@@ -49,10 +49,16 @@ route.post("/", authenticate, (req, res) => {
                   .insert({ user_id, organization_id: id[0] })
                   .then(result => {
                     if (result.rowCount) {
-                      res.status(201).json({
-                        message: "Successfully created",
-                        success: true
-                      });
+                      db("organizations")
+                        .where({ id: id[0] })
+                        .first()
+                        .then(orgs => {
+                          res.status(201).json({
+                            message: "Successfully created",
+                            success: true,
+                            organization: orgs
+                          });
+                        });
                     } else {
                       res
                         .status(500)
